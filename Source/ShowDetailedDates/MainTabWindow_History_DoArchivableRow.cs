@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -31,9 +32,31 @@ public static class MainTabWindow_History_DoArchivableRow
     private static string ConditionalDateString(long absTicks, Vector2 location)
     {
         // If ALT-key is pressed, return custom date-string, else call DateShortStringAt
-        return Event.current.alt
-            ? "SDD.DateWithHour".Translate(GenDate.HourInteger(absTicks, location.x) + "LetterHour".Translate(),
-                GenDate.Quadrum(absTicks, location.x).LabelShort(), GenDate.DayOfSeason(absTicks, location.x) + 1)
-            : GenDate.DateShortStringAt(absTicks, location);
+        if (!Event.current.alt)
+        {
+            return GenDate.DateShortStringAt(absTicks, location);
+        }
+
+        var dayPercent = GenDate.DayPercent(absTicks, location.x);
+
+        var hours = Math.Floor(dayPercent * 24);
+        if (Prefs.TwelveHourClockMode)
+        {
+            hours = dayPercent < 0.6 ? hours : hours - 12;
+        }
+
+        var minutes = Math.Floor(dayPercent * 24 % 1 * 60);
+        var seconds = Math.Floor(dayPercent * 24 % 1 * 60 % 1 * 60);
+        var timeString = $"{hours,0:00}:{minutes,0:00}:{seconds,0:00}";
+
+        if (!Prefs.TwelveHourClockMode)
+        {
+            return timeString;
+        }
+
+        timeString = $"{hours,0}:{minutes,0:00}:{seconds,0:00}";
+        timeString += $" {(dayPercent < 0.5 ? "AM" : "PM")}";
+
+        return timeString;
     }
 }
