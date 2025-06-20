@@ -22,14 +22,14 @@ public static class MainTabWindow_History_DoArchivableRow
                 AccessTools.Method(typeof(GenDate), nameof(GenDate.DateShortStringAt)))
             {
                 codes[i].operand = AccessTools.Method(typeof(MainTabWindow_History_DoArchivableRow),
-                    nameof(ConditionalDateString));
+                    nameof(conditionalDateString));
             }
         }
 
         return codes.AsEnumerable();
     }
 
-    private static string ConditionalDateString(long absTicks, Vector2 location)
+    private static string conditionalDateString(long absTicks, Vector2 location)
     {
         // If ALT-key is pressed, return custom date-string, else call DateShortStringAt
         if (!Event.current.alt)
